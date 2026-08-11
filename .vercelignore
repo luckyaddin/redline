@@ -1,0 +1,8 @@
+.sites-runtime
+.openai
+build
+dist
+drizzle
+examples
+scripts
+worker
