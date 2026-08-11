@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { Box, Check, Clock3, Gauge, MessageCircle, Phone, Search, SlidersHorizontal, Truck, Wifi } from "lucide-react";
 import { collection, doc, getDoc, getDocs, orderBy, query as firestoreQuery } from "firebase/firestore";
@@ -136,7 +137,7 @@ export function TrackingExperience() {
 
           <div className="tracking-detail-grid">
             <div className="shipment-details">
-              <div className="detail-tabs"><button className="active">Vehicle & cargo</button><button>Order details</button><button>History</button></div>
+              <div className="detail-tabs"><button className="active">Vehicle & cargo</button><button>Order details</button><button>History</button><Link className="receipt-tab" href={`/receipt/${shipment.trackingNumber}`} target="_blank" rel="noopener noreferrer">Print receipt</Link></div>
               <div className="progress-header"><span>{shipment.progress}% complete</span><small>{shipment.trackingNumber}</small></div>
               <div className="progress-track"><i style={{ width: `${shipment.progress}%` }} /></div>
               <div className="vehicle-card">
