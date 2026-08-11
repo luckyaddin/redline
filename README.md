@@ -16,7 +16,7 @@ Enable Email/Password authentication in Firebase Authentication and create at le
 
 ## Environment variables
 
-Copy `.env.example` to `.env.local` and provide all `NEXT_PUBLIC_FIREBASE_*` values. Add `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and optionally `RESEND_REPLY_TO` to enable shipment emails.
+Copy `.env.example` to `.env.local` and provide all `NEXT_PUBLIC_FIREBASE_*` values. Add `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and optionally `RESEND_REPLY_TO` to enable shipment emails. Set `NEXT_PUBLIC_SITE_URL` to your production domain (e.g. `https://redlinekw.com`) for sitemap and social sharing.
 
 ## Private portal
 

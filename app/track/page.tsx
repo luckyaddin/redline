@@ -1,10 +1,12 @@
+import type { Metadata } from "next";
 import { SiteFooter } from "../components/SiteFooter";
 import { SiteHeader } from "../components/SiteHeader";
 import { TrackingExperience } from "./TrackingExperience";
 
-export const metadata = {
-  title: "Track Your Shipment | RedLine Kuwait Logistics",
-  description: "Follow your RedLine shipment with live milestones, location and delivery status.",
+export const metadata: Metadata = {
+  title: "Track Your Shipment",
+  description: "Follow your RedLine shipment in real time with live milestones, current location, route details and delivery estimate.",
+  alternates: { canonical: "/track" },
 };
 
 export default function TrackingPage() {

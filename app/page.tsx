@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -13,6 +14,10 @@ import {
 } from "lucide-react";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const services = [
   {
@@ -49,8 +54,34 @@ const stats = [
 ];
 
 export default function Home() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://redlinekw.com";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${siteUrl}/#organization`,
+        name: "RedLine Kuwait Logistics",
+        url: siteUrl,
+        logo: `${siteUrl}/icon.svg`,
+        email: "hello@redlinekw.com",
+        telephone: "+96522286400",
+        address: { "@type": "PostalAddress", streetAddress: "Block 1, Street 17, Shuwaikh Industrial", addressLocality: "Kuwait City", addressCountry: "KW" },
+        contactPoint: { "@type": "ContactPoint", telephone: "+96522286400", contactType: "customer service", areaServed: ["KW", "AE", "SA", "QA", "BH", "OM"], availableLanguage: ["en", "ar"] },
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}/#website`,
+        url: siteUrl,
+        name: "RedLine Kuwait Logistics",
+        publisher: { "@id": `${siteUrl}/#organization` },
+      },
+    ],
+  };
+
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SiteHeader />
 
       <section className="hero-shell">

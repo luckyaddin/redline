@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Award, Globe2, HeartHandshake, ShieldCheck, Users } from "lucide-react";
 import { InnerPageHero } from "../components/InnerPageHero";
 import { SiteFooter } from "../components/SiteFooter";
 import { SiteHeader } from "../components/SiteHeader";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description: "RedLine Kuwait Logistics — Kuwaiti at heart, global by design. Learn about our story, values and the 86-member team behind every shipment.",
+  alternates: { canonical: "/about" },
+};
 
 export default function AboutPage() {
   return <main><SiteHeader /><InnerPageHero kicker="Kuwaiti at heart. Global by design." title="Logistics made personal." copy="RedLine was built in Kuwait around a simple belief: customers deserve clear answers, responsible ownership and a team that treats every shipment like it matters." image="/images/premium-gulf-fulfillment-warehouse.png" cta={{ label: "Meet our Kuwait team", href: "/contact" }} />

@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Clock3, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { SiteFooter } from "../components/SiteFooter";
 import { SiteHeader } from "../components/SiteHeader";
+
+export const metadata: Metadata = {
+  title: "Contact Us",
+  description: "Talk to the RedLine Kuwait team — 24/7 operations support, Shuwaikh headquarters, WhatsApp, phone and email contacts.",
+  alternates: { canonical: "/contact" },
+};
 
 export default function ContactPage() {
   return <main><SiteHeader /><section className="contact-hero"><div className="container contact-hero-grid"><div><span className="page-kicker">Talk to RedLine</span><h1>Good logistics starts with a clear conversation.</h1><p>Speak directly with our Kuwait team about a shipment, a service plan or an update you need.</p></div><div className="contact-quick"><a href="tel:+96522286400"><Phone /><span><small>CALL OUR TEAM</small><strong>+965 2228 6400</strong><em>Operations support, 24/7</em></span></a><a href="mailto:hello@redlinekw.com"><Mail /><span><small>EMAIL US</small><strong>hello@redlinekw.com</strong><em>Replies within one business hour</em></span></a><a href="https://wa.me/96522286400"><MessageCircle /><span><small>WHATSAPP</small><strong>Start a conversation</strong><em>Fast support for active shipments</em></span></a></div></div></section>

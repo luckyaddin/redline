@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Box, Boxes, Check, PackageCheck, Plane, Ship, Truck, Warehouse } from "lucide-react";
 import { InnerPageHero } from "../components/InnerPageHero";
 import { SiteFooter } from "../components/SiteFooter";
 import { SiteHeader } from "../components/SiteHeader";
+
+export const metadata: Metadata = {
+  title: "Freight Services",
+  description: "Air freight, ocean freight, GCC road transport, Kuwait distribution, warehousing and project cargo — every mode managed by one accountable RedLine team.",
+  alternates: { canonical: "/services" },
+};
 
 const modes = [
   { icon: Plane, title: "Air freight", copy: "Priority, charter and consolidated services via Kuwait International Airport.", details: ["Airport-to-airport", "Door-to-door", "Dangerous goods handling"] },
