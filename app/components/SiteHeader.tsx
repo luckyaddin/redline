@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { ArrowUpRight, Languages, MapPin, User as UserIcon } from "lucide-react";
+import { ArrowUpRight, Languages, MapPin, Phone, User as UserIcon } from "lucide-react";
 import { firebaseAuth } from "../../lib/firebase";
+import { cleanPhoneForTel, useSiteSettings } from "../../lib/site-settings";
 
 export function SiteHeader() {
   const [user, setUser] = useState<User | null>(null);
+  const settings = useSiteSettings();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, (currentUser) => {
@@ -20,9 +22,13 @@ export function SiteHeader() {
     <>
       <div className="topbar">
         <div className="container topbar-inner">
-          <span><MapPin size={13} /> Shuwaikh Industrial, Kuwait</span>
+          <span>
+            <MapPin size={13} /> {settings.cityCountry || "Shuwaikh Industrial, Kuwait"}
+          </span>
           <div>
-            <a href="tel:+96522286400">+965 2228 6400</a>
+            <a href={`tel:${cleanPhoneForTel(settings.supportPhone)}`} className="topbar-phone">
+              <Phone size={11} /> {settings.supportPhone}
+            </a>
             <span className="divider" />
             <Link href={user ? "/account/dashboard" : "/account/login"} className="topbar-portal-link">
               <UserIcon size={12} /> {user ? "My Account" : "Client Portal"}

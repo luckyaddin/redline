@@ -29,9 +29,11 @@ import {
   Clock,
   Clock3,
   ExternalLink,
+  Globe,
   Lock,
   LogOut,
   Mail,
+  MapPin,
   MessageSquare,
   Package,
   PackageSearch,
@@ -49,6 +51,7 @@ import { SHIPMENT_STATUS_STEPS, progressForStatus, statusDescription } from "../
 import { firebaseAuth, firebaseStorage, firestore } from "../../lib/firebase";
 import { interpolateRoute } from "../../lib/shipment-status";
 import { coordinatesForLocation } from "../../lib/location-coordinates";
+import { SiteSettings, defaultSiteSettings } from "../../lib/site-settings";
 
 type DashboardTab = "control" | "shipments" | "customers" | "support" | "fleet" | "settings";
 
@@ -142,16 +145,6 @@ type FleetAsset = {
   updatedAt: string;
 };
 
-type OperationsSettings = {
-  branchName: string;
-  dispatchEmail: string;
-  supportPhone: string;
-  timezone: string;
-  mapRefreshSeconds: number;
-  receiverNotifications: boolean;
-  delayAlerts: boolean;
-};
-
 function generateTrackingCode(): string {
   const chars = "0123456789";
   let randomDigits = "";
@@ -208,16 +201,6 @@ const emptyAsset = {
   serviceDue: "",
 };
 
-const defaultSettings: OperationsSettings = {
-  branchName: "Kuwait Operations Center",
-  dispatchEmail: "operations@redlinekw.com",
-  supportPhone: "+965 2228 6400",
-  timezone: "Asia/Kuwait",
-  mapRefreshSeconds: 10,
-  receiverNotifications: true,
-  delayAlerts: true,
-};
-
 function formatDate(value?: string) {
   if (!value) return "—";
   const date = new Date(value);
@@ -238,7 +221,7 @@ export function AdminDashboard({ user }: { user: { displayName: string; email: s
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [assets, setAssets] = useState<FleetAsset[]>([]);
-  const [settings, setSettings] = useState<OperationsSettings>(defaultSettings);
+  const [settings, setSettings] = useState<SiteSettings>(defaultSiteSettings);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
@@ -285,7 +268,7 @@ export function AdminDashboard({ user }: { user: { displayName: string; email: s
       setCustomers(customerRows.docs.map((item) => ({ id: item.id, ...item.data() } as Customer)));
       setAssets(assetRows.docs.map((item) => ({ id: item.id, ...item.data() } as FleetAsset)));
       setTickets(ticketRows.docs.map((item) => ({ id: item.id, ...(item.data() as Omit<SupportTicket, "id">) })));
-      setSettings(settingsRow.exists() ? { ...defaultSettings, ...(settingsRow.data() as Partial<OperationsSettings>) } : defaultSettings);
+      setSettings(settingsRow.exists() ? { ...defaultSiteSettings, ...(settingsRow.data() as Partial<SiteSettings>) } : defaultSiteSettings);
     } catch (e) {
       console.error(e);
     }
@@ -922,7 +905,7 @@ export function AdminDashboard({ user }: { user: { displayName: string; email: s
           )}
 
           {activeTab === "settings" && (
-            <SettingsPanel settings={settings} setSettings={setSettings} saveSettings={saveSettings} />
+            <SettingsTab settings={settings} setSettings={setSettings} saveSettings={saveSettings} />
           )}
         </div>
       </section>
@@ -1589,17 +1572,176 @@ function FleetRegister({
   );
 }
 
-function SettingsPanel({
+function SettingsTab({
   settings,
   setSettings,
   saveSettings,
 }: {
-  settings: OperationsSettings;
-  setSettings: (settings: OperationsSettings) => void;
+  settings: SiteSettings;
+  setSettings: (settings: SiteSettings) => void;
   saveSettings: (event: FormEvent) => Promise<void>;
 }) {
   return (
     <form className="settings-layout" onSubmit={saveSettings}>
+      {/* Public Contact & Marketing Info */}
+      <section className="admin-board settings-card">
+        <div className="settings-heading">
+          <span><Globe size={19} /></span>
+          <div>
+            <h2>Public contact & marketing channels</h2>
+            <p>Controls contact numbers, emails, addresses, and operating hours shown across the entire website.</p>
+          </div>
+        </div>
+        <div className="settings-fields">
+          <label>
+            Primary phone number (Topbar & website)
+            <input
+              required
+              value={settings.supportPhone}
+              onChange={(e) => setSettings({ ...settings, supportPhone: e.target.value })}
+              placeholder="+965 2228 6400"
+            />
+            <small>Displayed prominently on top of the website, header, contact page, and footer.</small>
+          </label>
+
+          <label>
+            General & marketing email
+            <input
+              required
+              type="email"
+              value={settings.contactEmail}
+              onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
+              placeholder="hello@redlinekw.com"
+            />
+            <small>Displayed on homepage, contact page, and footer for marketing/general inquiries.</small>
+          </label>
+
+          <label>
+            Customer support & care email
+            <input
+              required
+              type="email"
+              value={settings.supportEmail}
+              onChange={(e) => setSettings({ ...settings, supportEmail: e.target.value })}
+              placeholder="care@redlinekw.com"
+            />
+            <small>Shown in footer, tracking support, and automated receipts.</small>
+          </label>
+
+          <label>
+            Sales & new business email
+            <input
+              type="email"
+              value={settings.salesEmail || ""}
+              onChange={(e) => setSettings({ ...settings, salesEmail: e.target.value })}
+              placeholder="sales@redlinekw.com"
+            />
+            <small>Shown on contact page under commercial & sales department.</small>
+          </label>
+
+          <label>
+            WhatsApp support number
+            <input
+              value={settings.whatsappNumber || ""}
+              onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
+              placeholder="+965 2228 6400"
+            />
+            <small>Direct WhatsApp link on the contact page.</small>
+          </label>
+
+          <label>
+            Physical office address
+            <input
+              value={settings.officeAddress || ""}
+              onChange={(e) => setSettings({ ...settings, officeAddress: e.target.value })}
+              placeholder="Block 1, Street 17"
+            />
+            <small>Street line shown in footer and contact page.</small>
+          </label>
+
+          <label>
+            City & region / country
+            <input
+              value={settings.cityCountry || ""}
+              onChange={(e) => setSettings({ ...settings, cityCountry: e.target.value })}
+              placeholder="Shuwaikh Industrial, Kuwait"
+            />
+            <small>Shown in the website topbar and footer location badge.</small>
+          </label>
+
+          <label>
+            Support operating hours
+            <input
+              value={settings.businessHours || ""}
+              onChange={(e) => setSettings({ ...settings, businessHours: e.target.value })}
+              placeholder="Operations support, 24/7"
+            />
+            <small>Customer support availability badge.</small>
+          </label>
+
+          <label>
+            Office working hours
+            <input
+              value={settings.officeHours || ""}
+              onChange={(e) => setSettings({ ...settings, officeHours: e.target.value })}
+              placeholder="Sunday–Thursday, 8:00 AM–6:00 PM"
+            />
+            <small>Physical HQ visiting hours.</small>
+          </label>
+
+          <label>
+            Email response time note
+            <input
+              value={settings.emailResponseTime || ""}
+              onChange={(e) => setSettings({ ...settings, emailResponseTime: e.target.value })}
+              placeholder="Replies within one business hour"
+            />
+            <small>Displayed under email links on the contact page.</small>
+          </label>
+        </div>
+      </section>
+
+      {/* Live Website Preview */}
+      <section className="admin-board settings-card">
+        <div className="settings-heading">
+          <span><MessageSquare size={19} /></span>
+          <div>
+            <h2>Live website preview</h2>
+            <p>How your updated contact information looks to visitors on the website.</p>
+          </div>
+        </div>
+        <div className="preview-channels-box">
+          <div className="preview-topbar-mock">
+            <span className="preview-pill"><MapPin size={11} /> {settings.cityCountry || "Shuwaikh Industrial, Kuwait"}</span>
+            <span className="preview-pill"><Phone size={11} /> {settings.supportPhone || "+965 2228 6400"}</span>
+            <span className="preview-pill"><Mail size={11} /> {settings.contactEmail || "hello@redlinekw.com"}</span>
+          </div>
+          <div className="preview-cards-grid">
+            <div className="preview-contact-item">
+              <small>TOPBAR & PHONE</small>
+              <strong>{settings.supportPhone || "+965 2228 6400"}</strong>
+              <span>{settings.businessHours || "Operations support, 24/7"}</span>
+            </div>
+            <div className="preview-contact-item">
+              <small>MARKETING EMAIL</small>
+              <strong>{settings.contactEmail || "hello@redlinekw.com"}</strong>
+              <span>{settings.emailResponseTime || "Replies within one business hour"}</span>
+            </div>
+            <div className="preview-contact-item">
+              <small>WHATSAPP SUPPORT</small>
+              <strong>{settings.whatsappNumber || "+965 2228 6400"}</strong>
+              <span>Fast support for active shipments</span>
+            </div>
+            <div className="preview-contact-item">
+              <small>HEADQUARTERS</small>
+              <strong>{settings.officeAddress || "Block 1, Street 17"}</strong>
+              <span>{settings.cityCountry || "Shuwaikh Industrial, Kuwait"}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Operations & System Controls */}
       <section className="admin-board settings-card">
         <div className="settings-heading">
           <span><Building2 size={19} /></span>
@@ -1618,11 +1760,6 @@ function SettingsPanel({
             <input required type="email" value={settings.dispatchEmail} onChange={(e) => setSettings({ ...settings, dispatchEmail: e.target.value })} />
           </label>
           <label>
-            Support phone
-            <input required value={settings.supportPhone} onChange={(e) => setSettings({ ...settings, supportPhone: e.target.value })} placeholder="+965 2228 6400" />
-            <small>Shown on the public tracking page and customer receipts.</small>
-          </label>
-          <label>
             Timezone
             <select value={settings.timezone} onChange={(e) => setSettings({ ...settings, timezone: e.target.value })}>
               <option value="Asia/Kuwait">Kuwait (UTC+3)</option>
@@ -1638,6 +1775,7 @@ function SettingsPanel({
         </div>
       </section>
 
+      {/* Notification Controls */}
       <section className="admin-board settings-card">
         <div className="settings-heading">
           <span><BellRing size={19} /></span>
@@ -1666,7 +1804,7 @@ function SettingsPanel({
 
       <div className="settings-save">
         <button type="submit"><Save size={17} /> Save settings</button>
-        <span>Changes are stored for the Kuwait Operations Center.</span>
+        <span>Changes are saved to Kuwait Operations and applied instantly to the live website.</span>
       </div>
     </form>
   );
